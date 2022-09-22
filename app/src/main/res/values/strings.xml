@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">PersistenceApp</string>
+    <string name="title">Registro</string>
+    <string name="identificacion">Identificación</string>
+    <string name="nombre">Nombre</string>
+    <string name="apellidos">Apellidos</string>
+    <string name="insertar">Insertar</string>
+    <string name="buscar">Buscar</string>
+    <string name="modificar">Modificar</string>
+    <string name="eliminar">Eliminar</string>
+</resources>
