@@ -2,8 +2,13 @@ package com.miklegonza.persistenceapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethod;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -24,33 +29,36 @@ public class MainActivity extends AppCompatActivity {
 
     private final String baseURL = "http://192.168.0.12:3000/";
 
-    EditText edtId;
-    EditText edtName;
-    EditText edtLast;
-    Button btnInsert;
-    Button btnFind;
-    Button btnModify;
-    Button btnDelete;
+    private EditText edtId;
+    private EditText edtName;
+    private EditText edtLast;
+    private Button btnInsert;
+    private Button btnFind;
+    private Button btnModify;
+    private Button btnDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        setTheme(R.style.Theme_PersistenceApp);
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_PersistenceApp);
         setContentView(R.layout.activity_main);
 
+        init();
+        listeners();
+    }
+
+    private void init() {
         this.edtId = findViewById(R.id.editId);
+        this.edtId.requestFocus();
         this.edtName = findViewById(R.id.editName);
         this.edtLast = findViewById(R.id.editLast);
         this.btnInsert = findViewById(R.id.btnInsert);
         this.btnFind = findViewById(R.id.btnFind);
         this.btnModify = findViewById(R.id.btnModify);
         this.btnDelete = findViewById(R.id.btnDelete);
+    }
 
+    private void listeners() {
         this.btnInsert.setOnClickListener(view -> {
             insert(
                     edtId.getText().toString(),
@@ -84,8 +92,9 @@ public class MainActivity extends AppCompatActivity {
             edtId.setText("");
             edtName.setText("");
             edtLast.setText("");
+            hideKeyboard(this);
         }, error -> {
-            Log.e("Error", error.getMessage());
+            Toast.makeText(MainActivity.this, error.getMessage() + "", Toast.LENGTH_LONG).show();
         }) {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
@@ -113,12 +122,12 @@ public class MainActivity extends AppCompatActivity {
                         edtLast.setText(jsonObject.getString("apellidos"));
                     }
                 }
-                Toast.makeText(MainActivity.this, "Result: " + response, Toast.LENGTH_LONG).show();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            hideKeyboard(this);
         }, error -> {
-            Log.e("Error", error.getMessage());
+            Toast.makeText(MainActivity.this, error.getMessage() + "", Toast.LENGTH_LONG).show();
         }) {
             protected Map<String, String> getParams() {
                 Map<String, String> query = new HashMap<>();
@@ -138,8 +147,9 @@ public class MainActivity extends AppCompatActivity {
             edtId.setText("");
             edtName.setText("");
             edtLast.setText("");
+            hideKeyboard(this);
         }, error -> {
-            Log.e("Error", error.getMessage());
+            Toast.makeText(MainActivity.this, error.getMessage() + "", Toast.LENGTH_LONG).show();
         }) {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
@@ -160,8 +170,18 @@ public class MainActivity extends AppCompatActivity {
             edtId.setText("");
             edtName.setText("");
             edtLast.setText("");
-        }, error -> Log.e("Error", error.getMessage() + ""));
+            hideKeyboard(this);
+        }, error -> {
+            Toast.makeText(MainActivity.this, error.getMessage() + "", Toast.LENGTH_LONG).show();
+        });
         Volley.newRequestQueue(this).add(deleteRequest);
+    }
+
+    private static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        View view = activity.getCurrentFocus();
+        if (view == null) view = new View(activity);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 }
